@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from pathlib import Path
 from typing import cast
@@ -68,6 +69,12 @@ class MusicPlayer:
             self._queue.insert(0, track_to_clean)
         await self._play_next()
 
+    @staticmethod
+    def _lambda_wrapper(fn, *args, loop=None):
+        if loop is None:
+            loop = asyncio.get_event_loop()
+        asyncio.ensure_future(fn(*args), loop=loop)
+
     async def _play_next(self):
         if len(self._queue) == 0:
             self._is_started = False
@@ -86,9 +93,10 @@ class MusicPlayer:
         if self.voice_client.is_playing():
             self.voice_client.stop()
 
+        loop = asyncio.get_event_loop()
         self.voice_client.play(source,
-                               after=lambda e: run(self._handle_error(e, track)) if e
-                               else run(self._clean_and_play_next(track)))
+                               after=lambda e: self._lambda_wrapper(self._handle_error, e, track, loop=loop) if e
+                               else self._lambda_wrapper(self._clean_and_play_next, track, loop=loop))
         logger.info(f"Playing: {track.title}")
 
 
