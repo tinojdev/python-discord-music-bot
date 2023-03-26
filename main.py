@@ -4,14 +4,11 @@ import os
 import asyncio
 
 from discord.ext import commands
-from dotenv import load_dotenv, find_dotenv
 
 from src.command_handler import CommandHandler
 from src.event_handler import EventHandler
 from src.temp_handler import TempHandler
 from src.task_runner import TaskRunner
-
-load_dotenv(find_dotenv(".env"))
 
 BOT_TOKEN = os.getenv("DISCORD_TOKEN")
 

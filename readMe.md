@@ -7,7 +7,7 @@ Originally written in Typescript but now ported to python because npm libraries 
 ## Setup
 
 - Download and install ffmpeg
-- Add a .env file with the following contents:
+- Set the following environment variables:
 
 ```
 DISCORD_TOKEN=your_token_here
