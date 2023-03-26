@@ -1,0 +1,4 @@
+discord.py[voice] ~= 2.2.2
+discord ~= 2.2.2
+yt-dlp ~= 2023.3.4
+python-dotenv ~= 1.0.0
