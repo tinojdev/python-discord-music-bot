@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.music_player import MusicPlayer
+    from music_player import MusicPlayer
 
 
 class MusicPlayerStore:

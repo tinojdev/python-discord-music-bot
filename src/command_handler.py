@@ -3,10 +3,10 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
 
-from src.music_player import MusicPlayer, QueueEmptyError
-from src.music_player_store import MusicPlayerStore
-from src.downloader import Downloader
-from src.commands.now_playing import now_playing
+from music_player import MusicPlayer, QueueEmptyError
+from music_player_store import MusicPlayerStore
+from downloader import Downloader
+from commands.now_playing import now_playing
 
 
 class CommandHandler(commands.Cog):
@@ -76,7 +76,9 @@ class CommandHandler(commands.Cog):
 
         if len(queue) == 0:
             return await ctx.send("No more tracks in queue.")
-        track_str = "\n".join([f"{i + 1}. {track.title}" for i, track in enumerate(queue)])
+        track_str = "\n".join(
+            [f"{i + 1}. {track.title}" for i, track in enumerate(queue)]
+        )
         await ctx.send(f"Tracks in queue:\n{track_str}")
 
     @commands.command(aliases=["np"])

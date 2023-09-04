@@ -2,7 +2,7 @@ import logging
 
 from discord.ext import commands, tasks
 
-from src.temp_handler import TempHandler
+from temp_handler import TempHandler
 
 logger = logging.getLogger(__name__)
 

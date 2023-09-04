@@ -5,14 +5,13 @@ from typing import cast
 
 import discord
 
-from src.models.track import Track
-from asyncio import run
-from src.downloader import Downloader
-from src.temp_handler import TempHandler
-from src.music_player_store import MusicPlayerStore
+from models.track import Track
+from downloader import Downloader
+from temp_handler import TempHandler
+from music_player_store import MusicPlayerStore
 
 FFMPEG_OPTIONS = {
-    'options': '-vn',
+    "options": "-vn",
 }
 
 logger = logging.getLogger(__name__)
@@ -94,15 +93,22 @@ class MusicPlayer:
             self.voice_client.stop()
 
         loop = asyncio.get_event_loop()
-        self.voice_client.play(source,
-                               after=lambda e: self._lambda_wrapper(self._handle_error, e, track, loop=loop) if e
-                               else self._lambda_wrapper(self._clean_and_play_next, track, loop=loop))
+        self.voice_client.play(
+            source,
+            after=lambda e: self._lambda_wrapper(
+                self._handle_error, e, track, loop=loop
+            )
+            if e
+            else self._lambda_wrapper(self._clean_and_play_next, track, loop=loop),
+        )
         logger.info(f"Playing: {track.title}")
 
 
 class MusicSource(discord.PCMVolumeTransformer):
     def __init__(self, filename, *, volume=0.5):
-        super().__init__(discord.FFmpegPCMAudio(filename, **FFMPEG_OPTIONS), volume=volume)
+        super().__init__(
+            discord.FFmpegPCMAudio(filename, **FFMPEG_OPTIONS), volume=volume
+        )
         self.time_played_in_seconds = 0.0
 
     def read(self):

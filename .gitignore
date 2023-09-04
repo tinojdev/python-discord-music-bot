@@ -2,4 +2,5 @@
 /venv/
 .env
 /temp/
+pyrightconfig.json
 __pycache__

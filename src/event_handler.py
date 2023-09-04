@@ -7,7 +7,7 @@ class EventHandler(Cog):
 
     @Cog.listener()
     async def on_ready(self):
-        print(f'Logged in as {self.bot.user} (ID: {self.bot.user.id})')
+        print(f"Logged in as {self.bot.user} (ID: {self.bot.user.id})")
 
     @Cog.listener()
     async def on_message(self, message):
