@@ -15,7 +15,7 @@ class TempHandler:
         cls.TEMP_DIR = os.getenv("TEMP_DIR", None)
 
         if cls.TEMP_DIR is None:
-            cls.TEMP_DIR = "./temp"
+            cls.TEMP_DIR = "../temp"
 
         return cls.TEMP_DIR
 
