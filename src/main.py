@@ -20,7 +20,7 @@ intents.message_content = True
 
 
 def get_prefix(*_):
-    return "§"
+    return "!"
 
 
 logging.basicConfig(level=logging.INFO)
