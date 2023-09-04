@@ -1,0 +1,9 @@
+[tool.pyright]
+exclude = ["venv"]
+include = ["src"]
+venv = "./venv"
+venvPath = "."
+
+reportMissingImports = true
+pythonVersion = "3.11"
+
