@@ -1,3 +1,7 @@
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv(".env"))
+
 import logging
 import discord
 import os
@@ -44,7 +48,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    from dotenv import load_dotenv, find_dotenv
-
-    load_dotenv(find_dotenv(".env"))
     asyncio.run(main())

@@ -1,12 +1,15 @@
-import discord
+import logging
 
 from discord.ext import commands
 from discord.ext.commands import Bot
-
-from music_player import MusicPlayer, QueueEmptyError
-from music_player_store import MusicPlayerStore
-from downloader import Downloader
+from commands.play import play
+from commands.play_playlist import play_playlist
 from commands.now_playing import now_playing
+from commands.queue import queue
+
+from music_player_store import MusicPlayerStore
+
+logger = logging.getLogger(__name__)
 
 
 class CommandHandler(commands.Cog):
@@ -17,33 +20,13 @@ class CommandHandler(commands.Cog):
     async def ping(self, ctx):
         await ctx.send("pong")
 
-    @commands.command()
-    async def join(self, ctx, *, channel: discord.VoiceChannel):
-        """Joins a voice channel"""
-
-        if ctx.voice_client is not None:
-            return await ctx.voice_client.move_to(channel)
-
-        await channel.connect()
-
     @commands.command(aliases=["p"])
-    async def play(self, ctx, *, url):
-        music_player = MusicPlayerStore.get_music_player(ctx.guild.id)
-        has_queue = music_player is not None
-        if not has_queue:
-            music_player = MusicPlayer(ctx.guild.id, ctx.voice_client)
-            MusicPlayerStore.add_music_player(ctx.guild.id, music_player)
-        async with ctx.typing():
-            if has_queue:
-                track = await Downloader.get_track_info(url)
-            else:
-                track = await Downloader.download(url)
-            await music_player.play(track)
+    async def play(self, ctx, *, url: str):
+        return await play(ctx, url)
 
-            if has_queue:
-                await ctx.send(f"Added to queue: {track.title}")
-            else:
-                await ctx.send(f"Now playing: {track.title}")
+    @commands.command(aliases=["pp", "playlist"])
+    async def play_playlist(self, ctx, *, url: str):
+        return await play_playlist(ctx, url)
 
     @commands.command(aliases=["s"])
     async def skip(self, ctx):
@@ -68,18 +51,7 @@ class CommandHandler(commands.Cog):
 
     @commands.command(aliases=["q"])
     async def queue(self, ctx):
-        music_player = MusicPlayerStore.get_music_player(ctx.guild.id)
-        if music_player is None:
-            return await ctx.send("No music is playing!")
-
-        queue = music_player.get_queue()
-
-        if len(queue) == 0:
-            return await ctx.send("No more tracks in queue.")
-        track_str = "\n".join(
-            [f"{i + 1}. {track.title}" for i, track in enumerate(queue)]
-        )
-        await ctx.send(f"Tracks in queue:\n{track_str}")
+        return await queue(ctx)
 
     @commands.command(aliases=["np"])
     async def now_playing(self, ctx):
@@ -98,9 +70,13 @@ class CommandHandler(commands.Cog):
     @commands.command()
     async def stop(self, ctx):
         """Stops and disconnects the bot from voice"""
-        await ctx.voice_client.disconnect()
+        music_player = MusicPlayerStore.get_music_player(ctx.guild.id)
+        if music_player is None:
+            return await ctx.send("No music is playing!")
+        await music_player.voice_client.disconnect()
 
     @play.before_invoke
+    @play_playlist.before_invoke
     async def ensure_voice(self, ctx):
         if ctx.voice_client is None:
             if ctx.author.voice:

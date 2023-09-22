@@ -20,11 +20,14 @@ async def now_playing(ctx):
     if music_player is None:
         return await ctx.send("No music is playing!")
     song = music_player.get_now_playing()
+
+    if song is None:
+        return await ctx.send("No music is playing!")
     description = f'[**{song.title}**]({song.webpage_url}) \nLooping: {"✅" if music_player.is_looping else "❌"}'
 
-    embed = Embed(
-        title="Now playing:", color=15198183, description=description
-    ).set_thumbnail(url=song.thumbnail_url)
+    embed = Embed(title="Now playing:", color=15198183, description=description)
+    if song.thumbnail_url is not None:
+        embed = embed.set_thumbnail(url=song.thumbnail_url)
 
     total_length = song.duration_seconds
     time_played = total_length - music_player.seconds_left_in_current_track()

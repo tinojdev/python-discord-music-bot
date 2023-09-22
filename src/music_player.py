@@ -8,7 +8,7 @@ import discord
 from models.track import Track
 from downloader import Downloader
 from temp_handler import TempHandler
-from music_player_store import MusicPlayerStore
+import music_player_store
 
 FFMPEG_OPTIONS = {
     "options": "-vn",
@@ -20,12 +20,18 @@ logger = logging.getLogger(__name__)
 class MusicPlayer:
     _queue: list[Track] = []
     _is_started = False
-    _now_playing: Track = None
+    _now_playing: Track | None = None
     is_looping = False
 
     def __init__(self, guild_id, voice_client: discord.VoiceClient):
         self.guild_id = guild_id
         self.voice_client = voice_client
+
+    async def disconnect(self):
+        self._is_started = False
+        self.voice_client.stop()
+        await self.voice_client.disconnect(force=True)
+        music_player_store.MusicPlayerStore.remove_music_player(self.guild_id)
 
     async def play(self, track: Track):
         self._queue.append(track)
@@ -34,6 +40,11 @@ class MusicPlayer:
             await self._play_next()
 
     async def skip(self):
+        if self.voice_client._player is None:
+            return await self.disconnect()
+        if self._now_playing is None:
+            return await self.disconnect()
+
         self.voice_client._player.after = None
         await self._clean_and_play_next(self._now_playing)
 
@@ -42,6 +53,8 @@ class MusicPlayer:
 
     def seconds_left_in_current_track(self):
         source: MusicSource = cast(MusicSource, self.voice_client.source)
+        if self._now_playing is None:
+            return 0
         return self._now_playing.duration_seconds - source.time_played_in_seconds
 
     def total_length_seconds(self):
@@ -50,6 +63,9 @@ class MusicPlayer:
 
     def get_queue(self):
         return self._queue
+
+    def is_empty_queue(self):
+        return len(self._queue) == 0
 
     def queue_length(self):
         return len(self._queue)
@@ -76,10 +92,7 @@ class MusicPlayer:
 
     async def _play_next(self):
         if len(self._queue) == 0:
-            self._is_started = False
-            self.voice_client.stop()
-            await self.voice_client.disconnect(force=True)
-            MusicPlayerStore.remove_music_player(self.guild_id)
+            await self.disconnect()
             return
 
         track = self._queue.pop(0)

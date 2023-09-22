@@ -26,7 +26,10 @@ class TempHandler:
     @classmethod
     def rename_file_in_temp(cls, filename):
         random_name = os.urandom(24).hex()
-        os.rename(os.path.join(cls.get_temp_dir(), filename), os.path.join(cls.get_temp_dir(), random_name))
+        os.rename(
+            os.path.join(cls.get_temp_dir(), filename),
+            os.path.join(cls.get_temp_dir(), random_name),
+        )
         return random_name
 
     @classmethod

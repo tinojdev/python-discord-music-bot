@@ -1,4 +1,7 @@
+import logging
 from discord.ext.commands import Cog, Bot
+
+logger = logging.getLogger(__name__)
 
 
 class EventHandler(Cog):
@@ -7,7 +10,8 @@ class EventHandler(Cog):
 
     @Cog.listener()
     async def on_ready(self):
-        print(f"Logged in as {self.bot.user} (ID: {self.bot.user.id})")
+        if self.bot.user:
+            print(f"Logged in as {self.bot.user} (ID: {self.bot.user.id})")
 
     @Cog.listener()
     async def on_message(self, message):
@@ -17,4 +21,7 @@ class EventHandler(Cog):
 
     @Cog.listener()
     async def on_command_error(self, ctx, error):
+        logger.error(error)
+
         await ctx.send(error)
+        raise error

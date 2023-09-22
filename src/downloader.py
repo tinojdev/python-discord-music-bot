@@ -26,19 +26,11 @@ class Downloader:
     @classmethod
     async def get_track_info(cls, url) -> Track:
         data = ytdl.extract_info(url, download=False)
-
-        if "entries" in data:
-            # take first item from a playlist
-            data = data["entries"][0]
-
         return parse_dict_to_track(data)
 
     @classmethod
     async def download(cls, url) -> Track:
         data = ytdl.extract_info(url, download=True)
-        if "entries" in data:
-            # take first item from a playlist
-            data = data["entries"][0]
         filename = ytdl.prepare_filename(data)
         # go from ./temp/xxx to xxx
         filename = Path(filename).name
@@ -52,6 +44,43 @@ class Downloader:
         filename = random_filename
         return parse_dict_to_track(data, filename)
 
+    YTDL_PLAYLIST_OPTIONS = {
+        "extract_flat": "in_playlist",
+        "skip_download": True,
+    }
+
+    @classmethod
+    async def get_playlist_songs(cls, url) -> list[Track]:
+        with yt_dlp.YoutubeDL(cls.YTDL_PLAYLIST_OPTIONS) as ydl:
+            data = ydl.extract_info(url)
+            if data is None:
+                raise NotFoundError("Playlist not found")
+
+            if "entries" in data:
+                songs = [
+                    parse_playlist_dict_to_track(song)
+                    for song in data["entries"]
+                    if song is not None
+                ]
+                return songs
+            else:
+                raise NotFoundError("Playlist not found")
+
+
+def parse_playlist_dict_to_track(data) -> Track:
+    thumbnails = data.get("thumbnails")
+    thumbnail_url: str | None = thumbnails[0]["url"] if thumbnails else None
+
+    return Track(
+        title=data.get("title"),
+        thumbnail_url=thumbnail_url,
+        webpage_url=data.get("url"),
+        uploader=data.get("uploader"),
+        filename=None,
+        added_by=None,
+        duration_seconds=data.get("duration"),
+    )
+
 
 def parse_dict_to_track(data, filename=None) -> Track:
     return Track(
@@ -63,3 +92,7 @@ def parse_dict_to_track(data, filename=None) -> Track:
         duration_seconds=data.get("duration"),
         added_by=None,
     )
+
+
+class NotFoundError(Exception):
+    pass
