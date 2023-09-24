@@ -16,10 +16,17 @@ async def play_playlist(ctx: Context, url: str):
     try:
         songs = await Downloader.get_playlist_songs(url)
     except NotFoundError:
-        return await msg.edit(content="Playlist not found :(")
+        await msg.edit(content="Playlist not found :(")
+        if music_player.is_empty_queue():
+            await music_player.disconnect()
+        return
     except Exception as e:
         logger.error(e)
-        return await msg.edit(content="Error while trying to get playlist songs.")
+        await msg.edit(content="Error while trying to get playlist songs.")
+
+        if music_player.is_empty_queue():
+            await music_player.disconnect()
+        return
 
     await msg.edit(content=f"Found {len(songs)} songs. Adding to queue...")
 
