@@ -102,7 +102,12 @@ class MusicPlayer:
 
         track = self._queue.pop(0)
         if not track.is_downloaded():
-            track = await Downloader.download(track.webpage_url)
+            try:
+                track = await Downloader.download(track.webpage_url)
+            except Exception as e:
+                logger.error(f"Error while downloading track: {track.title}")
+                logger.error(e)
+                return await self._play_next()
         self._now_playing = track
 
         source = MusicSource(Path(TempHandler.get_temp_dir()) / track.filename)
