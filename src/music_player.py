@@ -1,4 +1,5 @@
 import asyncio
+import random
 import logging
 from typing import Optional
 from pathlib import Path
@@ -39,6 +40,9 @@ class MusicPlayer:
         if not self._is_started:
             self._is_started = True
             await self._play_next()
+
+    async def shuffle(self):
+        random.shuffle(self._queue)
 
     async def skip(self):
         if self.voice_client._player is None:

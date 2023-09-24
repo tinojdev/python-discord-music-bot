@@ -39,6 +39,13 @@ class CommandHandler(commands.Cog):
         await ctx.send("Skipped!")
 
     @commands.command()
+    async def shuffle(self, ctx):
+        music_player = MusicPlayerStore.get_music_player(ctx.guild.id)
+        if music_player is None:
+            return await ctx.send("No music is playing.")
+        await music_player.shuffle()
+
+    @commands.command()
     async def loop(self, ctx):
         music_player = MusicPlayerStore.get_music_player(ctx.guild.id)
         if music_player is None:

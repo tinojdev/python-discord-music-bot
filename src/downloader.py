@@ -62,7 +62,7 @@ class Downloader:
             data = ydl.extract_info(url)
             if data is None:
                 raise NotFoundError("Playlist not found")
-
+            print(data)
             if "entries" in data:
                 songs = [
                     parse_playlist_dict_to_track(song)
