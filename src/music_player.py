@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Optional
 from pathlib import Path
 from typing import cast
 
@@ -20,7 +21,7 @@ logger = logging.getLogger(__name__)
 class MusicPlayer:
     _queue: list[Track] = []
     _is_started = False
-    _now_playing: Track | None = None
+    _now_playing: Optional[Track] = None
     is_looping = False
 
     def __init__(self, guild_id, voice_client: discord.VoiceClient):
