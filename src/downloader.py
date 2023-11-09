@@ -1,13 +1,17 @@
+from __future__ import annotations
+
 import yt_dlp
 import os
+import logging
 
 from pathlib import Path
+from urllib.parse import urlparse
 from models.track import Track
 from temp_handler import TempHandler
 
 YTDL_FORMAT_OPTIONS = {
     "format": "bestaudio/best",
-    "outtmpl": f"{TempHandler.get_temp_dir()}/downloaded.%(ext)s",
+    "outtmpl": f"{TempHandler.get_temp_dir()}/downloaded",
     "restrictfilenames": True,
     "noplaylist": True,
     "nocheckcertificate": True,
@@ -18,6 +22,8 @@ YTDL_FORMAT_OPTIONS = {
     "default_search": "auto",
     "source_address": "0.0.0.0",  # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
+
+logger = logging.getLogger(__name__)
 
 ytdl = yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS)
 
@@ -58,10 +64,20 @@ class Downloader:
 
     @classmethod
     async def get_playlist_songs(cls, url) -> list[Track]:
+        if not is_valid_youtube_playlist_url(url):
+            raise InvalidUrlError("Invalid playlist url")
+
         with yt_dlp.YoutubeDL(cls.YTDL_PLAYLIST_OPTIONS) as ydl:
-            data = ydl.extract_info(url)
+            try:
+                data = ydl.extract_info(url)
+            except Exception as e:
+                logger.error("Error while getting playlist songs")
+                logger.error(e)
+                raise NotFoundError("Playlist not found")
+
             if data is None:
                 raise NotFoundError("Playlist not found")
+
             print(data)
             if "entries" in data:
                 songs = [
@@ -101,5 +117,20 @@ def parse_dict_to_track(data, filename=None) -> Track:
     )
 
 
+def is_valid_youtube_playlist_url(url) -> bool:
+    res = urlparse(url)
+    if res.scheme != "https":
+        return False
+    if res.netloc != "www.youtube.com":
+        return False
+    if "&list=" not in res.query:
+        return False
+    return True
+
+
 class NotFoundError(Exception):
+    pass
+
+
+class InvalidUrlError(Exception):
     pass

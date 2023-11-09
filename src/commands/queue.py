@@ -1,4 +1,4 @@
-from music_player_store import MusicPlayerStore
+from src.music_player_store import MusicPlayerStore
 
 
 MAX_PRINTABLE_QUEUE = 20

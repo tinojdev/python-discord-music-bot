@@ -1,5 +1,5 @@
 from discord import Embed
-from music_player_store import MusicPlayerStore
+from src.music_player_store import MusicPlayerStore
 
 
 def seconds_to_string(seconds: float):

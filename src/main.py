@@ -1,7 +1,3 @@
-from dotenv import load_dotenv, find_dotenv
-
-load_dotenv(find_dotenv(".env"))
-
 import logging
 import discord
 import os
@@ -9,12 +5,10 @@ import asyncio
 
 from discord.ext import commands
 
-
 from command_handler import CommandHandler
 from event_handler import EventHandler
 from temp_handler import TempHandler
 from task_runner import TaskRunner
-
 
 intents = discord.Intents.default()
 intents.guilds = True

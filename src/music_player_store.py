@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from music_player import MusicPlayer
+
 
 if TYPE_CHECKING:
     from music_player import MusicPlayer
@@ -18,6 +18,7 @@ class MusicPlayerStore:
     def get_or_create_music_player(cls, guild_id, voice_client):
         music_player = cls.get_music_player(guild_id)
         if music_player is None:
+            from music_player import MusicPlayer
             music_player = MusicPlayer(guild_id, voice_client)
             cls.add_music_player(guild_id, music_player)
         return music_player

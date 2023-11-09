@@ -1,7 +1,8 @@
 import logging
 from discord.ext.commands import Context
-from downloader import Downloader, NotFoundError
-from music_player_store import MusicPlayerStore
+from src.downloader import Downloader, NotFoundError, InvalidUrlError
+
+from src.music_player_store import MusicPlayerStore
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +16,11 @@ async def play_playlist(ctx: Context, url: str):
     msg = await ctx.reply("Searching for playlist...")
     try:
         songs = await Downloader.get_playlist_songs(url)
+    except InvalidUrlError:
+        await msg.edit(content="Only youtube links are supported.")
+        if music_player.is_empty_queue():
+            await music_player.disconnect()
+        return
     except NotFoundError:
         await msg.edit(content="Playlist not found :(")
         if music_player.is_empty_queue():

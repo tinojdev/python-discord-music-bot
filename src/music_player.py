@@ -10,7 +10,7 @@ import discord
 from models.track import Track
 from downloader import Downloader
 from temp_handler import TempHandler
-import music_player_store
+from music_player_store import MusicPlayerStore
 
 FFMPEG_OPTIONS = {
     "options": "-vn",
@@ -33,7 +33,7 @@ class MusicPlayer:
         self._is_started = False
         self.voice_client.stop()
         await self.voice_client.disconnect(force=True)
-        music_player_store.MusicPlayerStore.remove_music_player(self.guild_id)
+        MusicPlayerStore.remove_music_player(self.guild_id)
 
     async def play(self, track: Track):
         self._queue.append(track)
