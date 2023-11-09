@@ -1,8 +1,8 @@
 import logging
 from discord.ext.commands import Context
-from src.downloader import Downloader, NotFoundError, InvalidUrlError
+from downloader import Downloader, NotFoundError, InvalidUrlError
 
-from src.music_player_store import MusicPlayerStore
+from music_player_store import MusicPlayerStore
 
 logger = logging.getLogger(__name__)
 

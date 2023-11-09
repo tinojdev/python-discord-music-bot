@@ -1,7 +1,7 @@
 import logging
 from discord.ext.commands import Context
-from src.music_player_store import MusicPlayerStore
-from src.downloader import Downloader
+from music_player_store import MusicPlayerStore
+from downloader import Downloader
 
 logger = logging.getLogger(__name__)
 
